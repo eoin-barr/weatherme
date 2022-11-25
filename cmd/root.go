@@ -25,7 +25,7 @@ var rootCmd = &cobra.Command{
 			fmt.Println("This is a different message")
 			return
 		}
-		fmt.Println("No flag addded")
+		fmt.Println("No flag addded.")
 	},
 }
 
