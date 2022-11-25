@@ -1,0 +1,31 @@
+builds:
+  - binary: weatherme
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -mod=vendor
+
+release:
+  prerelease: auto
+
+universal_binaries:
+  - replace: true
+
+brews:
+  - name: weatherme
+    homepage: https://github.com/eoin-barr/weatherme
+    tap:
+      owner: eoin-barr
+      name: homebrew-eoin-barr
+    commit_author:
+      name: eoin-barr
+      email: eoin.barr@ucdconnect.ie
+
+checksum:
+  name_template: "checksums."
