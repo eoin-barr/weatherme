@@ -1,3 +1,10 @@
+env:
+  - FOO={{ .Env.OPEN_WEATHER_SECRET }}
+  - ENV_WITH_DEFAULT={{ if index .Env "ENV_WITH_DEFAULT"  }}{{ .Env.ENV_WITH_DEFAULT }}{{ else }}default_value{{ end }}
+before:
+  hooks:
+    - go mod tidy
+
 builds:
   - binary: weatherme
     goos:
@@ -29,12 +36,3 @@ brews:
 
 checksum:
   name_template: "checksums."
-
-env:
-  - FOO={{ .Env.OPEN_WEATHER_SECRET }}
-  - ENV_WITH_DEFAULT={{ if index .Env "ENV_WITH_DEFAULT"  }}{{ .Env.ENV_WITH_DEFAULT }}{{ else }}default_value{{ end }}
-before:
-  hooks:
-    - go mod tidy
-builds:
-- binary: program
