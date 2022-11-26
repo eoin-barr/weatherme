@@ -39,7 +39,7 @@ func formatString(result types.WeatherRes, city string) string {
 }
 
 func getWeather(args []string) {
-	city := strings.Join(args[1:], " ")
+	city := strings.Join(args[0:], " ")
 	secret := getSecret()
 	var u url.URL
 	u.Scheme = "https"
@@ -54,20 +54,20 @@ func getWeather(args []string) {
 
 	cityDetailsResp, err := http.Get(u.String())
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Hmmm, something went wrong 😢")
 		return
 	}
 
 	cityDetailsBody, err := ioutil.ReadAll(cityDetailsResp.Body)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Hmmm, something went wrong 😢")
 		return
 	}
 
 	var CityDetails types.CityDetails
 	err = json.Unmarshal(cityDetailsBody, &CityDetails)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Hmmm, something went wrong 😢")
 		return
 	}
 
@@ -91,20 +91,20 @@ func getWeather(args []string) {
 
 	weatherResp, err := http.Get(u2.String())
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Hmmm, something went wrong 😢")
 		return
 	}
 
 	weatherBody, err := ioutil.ReadAll(weatherResp.Body)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Hmmm, something went wrong 😢")
 		return
 	}
 
 	var WeatherRes types.WeatherRes
 	err = json.Unmarshal(weatherBody, &WeatherRes)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Hmmm, something went wrong 😢")
 		return
 	}
 
