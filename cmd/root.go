@@ -127,7 +127,7 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		if len(args) < 2 {
+		if len(args) < 1 {
 			fmt.Println("Please 'weatherme' keyword followed by a city")
 			return
 		}
