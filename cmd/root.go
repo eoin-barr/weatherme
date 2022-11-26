@@ -20,6 +20,11 @@ import (
 	"golang.org/x/text/language"
 )
 
+const (
+	All     string = "all"
+	Preview string = "preview"
+)
+
 func getSecret() string {
 	err := godotenv.Load()
 	if err != nil {
@@ -28,7 +33,7 @@ func getSecret() string {
 	return os.Getenv("OPEN_WEATHER_SECRET")
 }
 
-func formatString(result types.WeatherRes, city string) string {
+func formatPreview(result types.WeatherRes, city string) string {
 	temp := result.Main.Temp - 273.15
 
 	return "\n🌆 City:\t" + city + "\n" +
@@ -38,7 +43,36 @@ func formatString(result types.WeatherRes, city string) string {
 		"😰 Humitdity:\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n"
 }
 
-func getWeather(args []string) {
+func formatAll(result types.WeatherRes, city string) string {
+	temp := result.Main.Temp - 273.15
+	tempFeelsLike := result.Main.Feels_like - 273.15
+	tempMin := result.Main.Temp_min - 273.15
+	tempMax := result.Main.Temp_max - 273.15
+
+	return "\n🌆  City:\t\t" + city + "\n" +
+		"🌍  Country:\t\t" + result.Sys.Country + "\n" +
+		"⌚️  Timezone:\t\t" + strconv.Itoa(result.Timezone) + "\n" +
+		"🗺   Latitude:\t\t" + strconv.FormatFloat(result.Coord.Lat, 'f', 2, 32) + "\n" +
+		"🗺   Longitude:\t\t" + strconv.FormatFloat(result.Coord.Lon, 'f', 2, 32) + "\n\n" +
+
+		"🌤   Description:\t" + cases.Title(language.English, cases.Compact).String(result.Weather[0].Description) + "\n" +
+		"🌡   Temperature:\t" + strconv.FormatFloat(temp, 'f', 2, 32) + " °C" + "\n" +
+		"💁‍♀️  Temp Feels Like:\t" + strconv.FormatFloat(tempFeelsLike, 'f', 2, 32) + " °C" + "\n" +
+		"🔥  Temperature Max:\t" + strconv.FormatFloat(tempMax, 'f', 2, 32) + " °C" + "\n" +
+		"🧊  Temperature Min:\t" + strconv.FormatFloat(tempMin, 'f', 2, 32) + " °C" + "\n" +
+		"🌊  Pressure:\t\t" + strconv.FormatInt(int64(result.Main.Pressure), 10) + " hPa" + "\n" +
+		"😰  Humitdity:\t\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n\n" +
+
+		"☁️   Cloudiness:\t\t" + strconv.FormatInt(int64(result.Clouds.All), 10) + " %" + "\n" +
+		"🌬   Wind Speed:\t\t" + strconv.FormatFloat(result.Wind.Speed, 'f', 2, 32) + " m/s" + "\n" +
+		"🧭  Wind Direction:\t" + strconv.Itoa(result.Wind.Deg) + " °" + "\n" +
+		"🌁  Visibility:\t\t" + strconv.Itoa(result.Visibility) + "\n\n" +
+
+		"🌅  Sunrise:\t\t" + strconv.Itoa(result.Sys.Sunrise) + "\n" +
+		"🌇  Sunset:\t\t" + strconv.Itoa(result.Sys.Sunset) + "\n"
+}
+
+func getWeather(args []string, view string) {
 	city := strings.Join(args[0:], " ")
 	secret := getSecret()
 	var u url.URL
@@ -107,8 +141,12 @@ func getWeather(args []string) {
 		fmt.Println("Hmmm, something went wrong 😢")
 		return
 	}
+	if view == All {
+		fmt.Println(formatAll(WeatherRes, cases.Title(language.English, cases.Compact).String(city)))
+	} else {
+		fmt.Println(formatPreview(WeatherRes, cases.Title(language.English, cases.Compact).String(city)))
+	}
 
-	fmt.Println(formatString(WeatherRes, cases.Title(language.English, cases.Compact).String(city)))
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -118,20 +156,21 @@ var rootCmd = &cobra.Command{
 	Long:  `Type in weatherme and the name of a city to find out the weather in that city.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		flagVar, err := cmd.Flags().GetBool("differentmessage")
+		flagVar, err := cmd.Flags().GetBool("all")
 		if err != nil {
 			fmt.Println(err)
 		}
-		if flagVar {
-			fmt.Println("This is a different message")
-			return
-		}
-
 		if len(args) < 1 {
 			fmt.Println("Please 'weatherme' keyword followed by a city")
 			return
 		}
-		getWeather(args)
+
+		if flagVar {
+			getWeather(args, All)
+			return
+		}
+
+		getWeather(args, Preview)
 	},
 }
 
@@ -145,5 +184,5 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("differentmessage", "d", false, "Toggle a different message")
+	rootCmd.Flags().BoolP("all", "a", false, "Get a granular view of the weather")
 }

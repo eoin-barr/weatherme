@@ -55,3 +55,8 @@ type CityDetails []struct {
 	Lon        float64
 	Country    string
 }
+
+type WeatherView struct {
+	Preview string
+	All     string
+}
