@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -28,7 +29,7 @@ const (
 func getSecret() string {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("Error loading .env file")
+		log.Fatal(err)
 	}
 	return os.Getenv("OPEN_WEATHER_SECRET")
 }
