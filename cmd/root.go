@@ -75,7 +75,7 @@ func formatAll(result types.WeatherRes, city string) string {
 
 func getWeather(args []string, view string) {
 	city := strings.Join(args[0:], " ")
-	secret := getSecret()
+	secret := "db2aec76d1d51a968faea300e25e70cc"
 	var u url.URL
 	u.Scheme = "https"
 	u.Host = "api.openweathermap.org"
