@@ -35,6 +35,7 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
+          OPEN_WEATHER_API_SECRET: ${{secrets.OPEN_WEATHER_API_SECRET}}
       - name: Environment list
         run:
           env
