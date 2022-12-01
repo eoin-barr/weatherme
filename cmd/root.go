@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -27,13 +26,13 @@ const (
 )
 
 func getSecret() string {
-	env1, err1 := os.LookupEnv("OPEN_WEATHER_API_SECRET")
-	log.Println(env1, err1)
-	if env1 == "" {
-		fmt.Println("OPEN_WEATHER_API_SECRET not set")
-	} else {
-		fmt.Println("OPEN_WEATHER_API_SECRET set: ", env1)
-	}
+	// env1, err1 := os.LookupEnv("OPEN_WEATHER_API_SECRET")
+	// log.Println(env1, err1)
+	// if env1 == "" {
+	// 	fmt.Println("OPEN_WEATHER_API_SECRET not set")
+	// } else {
+	// 	fmt.Println("OPEN_WEATHER_API_SECRET set: ", env1)
+	// }
 
 	// err := godotenv.Load()
 	// if err != nil {
