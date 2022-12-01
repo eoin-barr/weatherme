@@ -33,7 +33,8 @@ func getSecret() string {
 		log.Fatal(err)
 	}
 	fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_SECRET"))
-	return os.Getenv("OPEN_WEATHER_SECRET")
+	return ""
+	// return os.Getenv("OPEN_WEATHER_SECRET")
 }
 
 func formatPreview(result types.WeatherRes, city string) string {
@@ -173,7 +174,7 @@ var rootCmd = &cobra.Command{
 			getWeather(args, All)
 			return
 		}
-
+		getSecret()
 		getWeather(args, Preview)
 	},
 }
