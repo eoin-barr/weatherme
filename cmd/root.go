@@ -41,7 +41,6 @@ func getSecret() string {
 	// }
 	// fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_API_SECRET"))
 	return ""
-	// return os.Getenv("OPEN_WEATHER_SECRET")
 }
 
 func formatPreview(result types.WeatherRes, city string) string {
