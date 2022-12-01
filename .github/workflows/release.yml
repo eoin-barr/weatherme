@@ -11,7 +11,7 @@ permissions:
   # issues: write
 
 env:
-  OPEN_WEATHER_API_KEY: ${{secrets.OPEN_WEATHER_API_KEY}}
+  OPEN_WEATHER_API_KEY: ${{secrets.OPEN_WEATHER_API_SECRET}}
 
 jobs:
   goreleaser:
