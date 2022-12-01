@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	"github.com/eoin-barr/weatherme/types"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -27,12 +27,19 @@ const (
 )
 
 func getSecret() string {
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
+	env1, err1 := os.LookupEnv("OPEN_WEATHER_API_SECRET")
+	log.Println(env1, err1)
+	if env1 == "" {
+		fmt.Println("OPEN_WEATHER_API_SECRET not set")
+	} else {
+		fmt.Println("OPEN_WEATHER_API_SECRET set: ", env1)
 	}
-	fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_API_KEY"))
+
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_API_SECRET"))
 	return ""
 	// return os.Getenv("OPEN_WEATHER_SECRET")
 }
