@@ -32,7 +32,7 @@ func getSecret() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_SECRET"))
+	fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_API_KEY"))
 	return ""
 	// return os.Getenv("OPEN_WEATHER_SECRET")
 }
