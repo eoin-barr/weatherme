@@ -1,4 +1,4 @@
-# Golang CLI Tool
+# Weatherme CLI Tool
 
 ![cli](assets/w12.gif)
 
