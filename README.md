@@ -1,5 +1,7 @@
 # Weatherme CLI Tool
 
+The cli tool no one needs. Find out the weather for any city from your terminal
+
 ![cli](assets/w12.gif)
 
 ## How to use
