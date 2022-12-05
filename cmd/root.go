@@ -49,7 +49,7 @@ func formatPreview(result types.WeatherRes, city string) string {
 		"🌤  Description:\t" + cases.Title(language.English, cases.Compact).String(result.Weather[0].Description) + "\n" +
 		"🌡  Temperature:\t" + strconv.FormatFloat(temp, 'f', 2, 32) + " °C" + "\n" +
 		"🌊 Pressure:\t" + strconv.FormatInt(int64(result.Main.Pressure), 10) + " hPa" + "\n" +
-		"😰 Humitdity:\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n"
+		"😰 Humidity:\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n"
 }
 
 func formatAll(result types.WeatherRes, city string) string {
@@ -70,7 +70,7 @@ func formatAll(result types.WeatherRes, city string) string {
 		"🔥  Temperature Max:\t" + strconv.FormatFloat(tempMax, 'f', 2, 32) + " °C" + "\n" +
 		"🧊  Temperature Min:\t" + strconv.FormatFloat(tempMin, 'f', 2, 32) + " °C" + "\n" +
 		"🌊  Pressure:\t\t" + strconv.FormatInt(int64(result.Main.Pressure), 10) + " hPa" + "\n" +
-		"😰  Humitdity:\t\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n\n" +
+		"😰  Humidity:\t\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n\n" +
 
 		"☁️   Cloudiness:\t\t" + strconv.FormatInt(int64(result.Clouds.All), 10) + " %" + "\n" +
 		"🌬   Wind Speed:\t\t" + strconv.FormatFloat(result.Wind.Speed, 'f', 2, 32) + " m/s" + "\n" +
