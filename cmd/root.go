@@ -77,7 +77,7 @@ func formatAll(result types.WeatherRes, city string) string {
 		"🌤   Description:\t" + cases.Title(language.English, cases.Compact).String(result.Weather[0].Description) + "\n" +
 		"🌡   Temperature:\t" + strconv.FormatFloat(temp, 'f', 2, 32) + " °C" + "\n" +
 		"💧  Dew point:\t\t" + strconv.FormatFloat(dewPoint, 'f', 2, 32) + " °C" + "\n" +
-		"💁‍♀️  Temp Feels Like:\t  " + strconv.FormatFloat(tempFeelsLike, 'f', 2, 32) + " °C" + "\n" +
+		"💁‍♀️  Temp Feels Like:\t\t" + strconv.FormatFloat(tempFeelsLike, 'f', 2, 32) + " °C" + "\n" +
 		"🔥  Temperature Max:\t" + strconv.FormatFloat(tempMax, 'f', 2, 32) + " °C" + "\n" +
 		"🧊  Temperature Min:\t" + strconv.FormatFloat(tempMin, 'f', 2, 32) + " °C" + "\n" +
 		"🌊  Pressure:\t\t" + strconv.FormatInt(int64(result.Main.Pressure), 10) + " hPa" + "\n" +
