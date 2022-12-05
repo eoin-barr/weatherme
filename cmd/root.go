@@ -46,9 +46,7 @@ func getSecret() string {
 func calculateDewPoint(temp float64, humidity float64) (float64) {
 	const a float64 = 17.62
 	const b float64 = 243.12
-
-	alpha := math.Log(humidity / 100 + a * temp / (b+temp))
-
+	alpha := math.Log(humidity / 100 + a * temp / (b + temp))
 	return math.Round(((b * alpha) / (a - alpha)) * 100) / 100
 }
 
