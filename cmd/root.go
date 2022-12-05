@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"math"
 
 	"github.com/eoin-barr/weatherme/types"
 	// "github.com/joho/godotenv"
@@ -42,6 +43,15 @@ func getSecret() string {
 	return ""
 }
 
+func calculateDewPoint(temp float64, humidity float64) (float64) {
+	const a float64 = 17.62
+	const b float64 = 243.12
+
+	alpha := math.Log(humidity / 100 + a * temp / (b+temp))
+
+	return math.Round(((b * alpha) / (a - alpha)) * 100) / 100
+}
+
 func formatPreview(result types.WeatherRes, city string) string {
 	temp := result.Main.Temp - 273.15
 
@@ -58,6 +68,8 @@ func formatAll(result types.WeatherRes, city string) string {
 	tempMin := result.Main.Temp_min - 273.15
 	tempMax := result.Main.Temp_max - 273.15
 
+	dewPoint := calculateDewPoint(temp, float64(result.Main.Humidity))
+
 	return "\n🌆  City:\t\t" + city + "\n" +
 		"🌍  Country:\t\t" + result.Sys.Country + "\n" +
 		"⌚️  Timezone:\t\t" + strconv.Itoa(result.Timezone) + "\n" +
@@ -66,7 +78,8 @@ func formatAll(result types.WeatherRes, city string) string {
 
 		"🌤   Description:\t" + cases.Title(language.English, cases.Compact).String(result.Weather[0].Description) + "\n" +
 		"🌡   Temperature:\t" + strconv.FormatFloat(temp, 'f', 2, 32) + " °C" + "\n" +
-		"💁‍♀️  Temp Feels Like:\t" + strconv.FormatFloat(tempFeelsLike, 'f', 2, 32) + " °C" + "\n" +
+		"💧  Dew point:\t\t" + strconv.FormatFloat(dewPoint, 'f', 2, 32) + " °C" + "\n" +
+		"💁‍♀️  Temp Feels Like:\t  " + strconv.FormatFloat(tempFeelsLike, 'f', 2, 32) + " °C" + "\n" +
 		"🔥  Temperature Max:\t" + strconv.FormatFloat(tempMax, 'f', 2, 32) + " °C" + "\n" +
 		"🧊  Temperature Min:\t" + strconv.FormatFloat(tempMin, 'f', 2, 32) + " °C" + "\n" +
 		"🌊  Pressure:\t\t" + strconv.FormatInt(int64(result.Main.Pressure), 10) + " hPa" + "\n" +
