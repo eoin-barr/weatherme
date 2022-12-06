@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"math"
+	"time"
 
 	"github.com/eoin-barr/weatherme/types"
 	// "github.com/joho/godotenv"
@@ -68,6 +69,9 @@ func formatAll(result types.WeatherRes, city string) string {
 
 	dewPoint := calculateDewPoint(temp, float64(result.Main.Humidity))
 
+	sunriseTime := time.UnixMilli(int64(result.Sys.Sunrise) * 1000)
+	sunsetTime := time.UnixMilli(int64(result.Sys.Sunset) * 1000)
+
 	return "\n🌆  City:\t\t" + city + "\n" +
 		"🌍  Country:\t\t" + result.Sys.Country + "\n" +
 		"⌚️  Timezone:\t\t" + strconv.Itoa(result.Timezone) + "\n" +
@@ -88,8 +92,8 @@ func formatAll(result types.WeatherRes, city string) string {
 		"🧭  Wind Direction:\t" + strconv.Itoa(result.Wind.Deg) + " °" + "\n" +
 		"🌁  Visibility:\t\t" + strconv.Itoa(result.Visibility) + "\n\n" +
 
-		"🌅  Sunrise:\t\t" + strconv.Itoa(result.Sys.Sunrise) + "\n" +
-		"🌇  Sunset:\t\t" + strconv.Itoa(result.Sys.Sunset) + "\n"
+		"🌅  Sunrise:\t\t" + sunriseTime.Format("15:04") + " (" + sunriseTime.Format(time.Kitchen) + ")\n" +
+		"🌇  Sunset:\t\t" + sunsetTime.Format("15:04") + " (" + sunsetTime.Format(time.Kitchen) + ")\n"
 }
 
 func getWeather(args []string, view string) {
