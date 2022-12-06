@@ -120,11 +120,16 @@ func getWeather(args []string, view string) {
 	if len(CityDetails) == 0 {
 		return
 	}
-  
-  var index = 0
-  if len(CityDetails) > 1 {
-    index =  selectCity(CityDetails) 
-  }
+
+	var index = 0
+	if len(CityDetails) > 1 {
+		filtered := uniqueCities(CityDetails)
+		if len(filtered) == 1 {
+			CityDetails = filtered
+		} else {
+			index = selectCity(filtered)
+		}
+	}
 
 	lat := CityDetails[index].Lat
 	lon := CityDetails[index].Lon
@@ -190,31 +195,50 @@ var rootCmd = &cobra.Command{
 		getWeather(args, Preview)
 	},
 }
-// Give the user a chance to select the correct city.
-func selectCity(cities types.CityDetails ) int {
-    fmt.Println("There are multiple cities with the same name.")
-    fmt.Println("Please select the city. ")
-    for i, c := range cities{
-      fmt.Println(fmt.Sprintf("%d: %s, %s", i, c.Name, c.Country))
-    }
-    var number int
-    var err error
 
-    r := bufio.NewReader(os.Stdin)
-    for {
-      fmt.Fprint(os.Stderr, fmt.Sprintf("Choose a city between 0 - %d: ",len(cities)-1))
-        input, _ := r.ReadString('\n')
-        number, err = strconv.Atoi(input[:len(input)-1])
-        if err != nil{
-          fmt.Println(fmt.Sprintf("%s is not a valid number", input))
-        }
-        
-        if number >= 0 && number < len(cities){
-          break;
-        }
-    }
-    return number
+// Remove duplicates from city list
+func uniqueCities(cities types.CityDetails) types.CityDetails {
+	var filtered types.CityDetails
+	for _, city := range cities {
+		duplicate := false
+		for _, c := range filtered {
+			if city.Name == c.Name && city.Country == c.Country {
+				duplicate = true
+			}
+		}
+		if duplicate == false {
+			filtered = append(filtered, city)
+		}
+	}
+	return filtered
 }
+
+// Give the user a chance to select the correct city.
+func selectCity(cities types.CityDetails) int {
+	fmt.Println("There are multiple cities with the same name.")
+	fmt.Println("Please select the city. ")
+	for i, c := range cities {
+		fmt.Println(fmt.Sprintf("%d: %s, %s", i, c.Name, c.Country))
+	}
+	var number int
+	var err error
+
+	r := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Fprint(os.Stderr, fmt.Sprintf("Choose a city between 0 - %d: ", len(cities)-1))
+		input, _ := r.ReadString('\n')
+		number, err = strconv.Atoi(input[:len(input)-1])
+		if err != nil {
+			fmt.Println(fmt.Sprintf("%s is not a valid number", input))
+		}
+
+		if number >= 0 && number < len(cities) {
+			break
+		}
+	}
+	return number
+}
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
