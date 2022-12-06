@@ -15,7 +15,6 @@ import (
 	"strings"
 
 	"github.com/eoin-barr/weatherme/types"
-
 	// "github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
