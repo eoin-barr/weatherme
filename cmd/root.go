@@ -4,6 +4,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -14,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/eoin-barr/weatherme/types"
+
 	// "github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
@@ -92,7 +94,7 @@ func getWeather(args []string, view string) {
 
 	q := u.Query()
 	q.Set("q", strings.ToLower(city))
-	q.Set("limit", "1")
+	q.Set("limit", "5")
 	q.Set("appid", secret)
 	u.RawQuery = q.Encode()
 
@@ -118,9 +120,14 @@ func getWeather(args []string, view string) {
 	if len(CityDetails) == 0 {
 		return
 	}
+  
+  var index = 0
+  if len(CityDetails) > 1 {
+    index =  selectCity(CityDetails) 
+  }
 
-	lat := CityDetails[0].Lat
-	lon := CityDetails[0].Lon
+	lat := CityDetails[index].Lat
+	lon := CityDetails[index].Lon
 
 	var u2 url.URL
 	u2.Scheme = "https"
@@ -183,7 +190,31 @@ var rootCmd = &cobra.Command{
 		getWeather(args, Preview)
 	},
 }
+// Give the user a chance to select the correct city.
+func selectCity(cities types.CityDetails ) int {
+    fmt.Println("There are multiple cities with the same name.")
+    fmt.Println("Please select the city. ")
+    for i, c := range cities{
+      fmt.Println(fmt.Sprintf("%d: %s, %s", i, c.Name, c.Country))
+    }
+    var number int
+    var err error
 
+    r := bufio.NewReader(os.Stdin)
+    for {
+      fmt.Fprint(os.Stderr, fmt.Sprintf("Choose a city between 0 - %d: ",len(cities)-1))
+        input, _ := r.ReadString('\n')
+        number, err = strconv.Atoi(input[:len(input)-1])
+        if err != nil{
+          fmt.Println(fmt.Sprintf("%s is not a valid number", input))
+        }
+        
+        if number >= 0 && number < len(cities){
+          break;
+        }
+    }
+    return number
+}
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
