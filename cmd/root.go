@@ -7,16 +7,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
-	"math"
 	"time"
 
 	"github.com/eoin-barr/weatherme/types"
-	// "github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -27,28 +26,11 @@ const (
 	Preview string = "preview"
 )
 
-func getSecret() string {
-	// env1, err1 := os.LookupEnv("OPEN_WEATHER_API_SECRET")
-	// log.Println(env1, err1)
-	// if env1 == "" {
-	// 	fmt.Println("OPEN_WEATHER_API_SECRET not set")
-	// } else {
-	// 	fmt.Println("OPEN_WEATHER_API_SECRET set: ", env1)
-	// }
-
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_API_SECRET"))
-	return ""
-}
-
-func calculateDewPoint(temp float64, humidity float64) (float64) {
+func calculateDewPoint(temp float64, humidity float64) float64 {
 	const a float64 = 17.62
 	const b float64 = 243.12
-	alpha := math.Log(humidity / 100 + a * temp / (b + temp))
-	return math.Round(((b * alpha) / (a - alpha)) * 100) / 100
+	alpha := math.Log(humidity/100 + a*temp/(b+temp))
+	return math.Round(((b*alpha)/(a-alpha))*100) / 100
 }
 
 func formatPreview(result types.WeatherRes, city string) string {
@@ -68,7 +50,7 @@ func formatAll(result types.WeatherRes, city string) string {
 	tempMax := result.Main.Temp_max - 273.15
 
 	dewPoint := calculateDewPoint(temp, float64(result.Main.Humidity))
-	
+
 	timeOffset := time.Duration(result.Timezone * int(time.Second))
 	sunriseTime := time.UnixMilli(int64(result.Sys.Sunrise) * 1000).Add(timeOffset).UTC()
 	sunsetTime := time.UnixMilli(int64(result.Sys.Sunset) * 1000).Add(timeOffset).UTC()
@@ -195,7 +177,6 @@ var rootCmd = &cobra.Command{
 			getWeather(args, All)
 			return
 		}
-		getSecret()
 		getWeather(args, Preview)
 	},
 }
