@@ -68,9 +68,10 @@ func formatAll(result types.WeatherRes, city string) string {
 	tempMax := result.Main.Temp_max - 273.15
 
 	dewPoint := calculateDewPoint(temp, float64(result.Main.Humidity))
-
-	sunriseTime := time.UnixMilli(int64(result.Sys.Sunrise) * 1000).Add(time.Duration(result.Timezone * int(time.Second))).UTC()
-	sunsetTime := time.UnixMilli(int64(result.Sys.Sunset) * 1000).Add(time.Duration(result.Timezone * int(time.Second))).UTC()
+	
+	timeOffset := time.Duration(result.Timezone * int(time.Second))
+	sunriseTime := time.UnixMilli(int64(result.Sys.Sunrise) * 1000).Add(timeOffset).UTC()
+	sunsetTime := time.UnixMilli(int64(result.Sys.Sunset) * 1000).Add(timeOffset).UTC()
 
 	return "\n🌆  City:\t\t" + city + "\n" +
 		"🌍  Country:\t\t" + result.Sys.Country + "\n" +
