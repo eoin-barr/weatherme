@@ -13,7 +13,7 @@ The cli tool no one needs. Find out the weather for any city from your terminal
 
 1. Run
     ```sh
-    brew install weatherme`
+    brew install weatherme
     ```
 
 1. Enter `weatherme <city-name>` to see the weather in a city (use the `-a` flag for more granular weather details)
