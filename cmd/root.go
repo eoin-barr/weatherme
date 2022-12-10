@@ -4,7 +4,6 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -19,6 +18,9 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 )
 
 const (
@@ -213,29 +215,55 @@ func uniqueCities(cities types.CityDetails) types.CityDetails {
 }
 
 // Give the user a chance to select the correct city.
-func selectCity(cities types.CityDetails) int {
-	fmt.Println("There are multiple cities with the same name.")
-	fmt.Println("Please select the city. ")
+func renderList(cities types.CityDetails) int {
+	if err := ui.Init(); err != nil {
+    fmt.Println(err)
+	}
+	defer ui.Close()
+
+	l := widgets.NewList()
+	l.Title = "There are multiple cities with the same name."
+  l.Border = false
 	for i, c := range cities {
-		fmt.Println(fmt.Sprintf("%d: %s, %s", i, c.Name, c.Country))
+		l.Rows = append(l.Rows, fmt.Sprintf("%d: %s, %s", i, c.Name, c.Country))
 	}
-	var number int
-	var err error
 
-	r := bufio.NewReader(os.Stdin)
+	l.WrapText = false
+	l.SetRect(0, 0, 100, 100)
+  l.SelectedRowStyle.Fg = ui.ColorGreen
+	ui.Render(l)
+	uiEvents := ui.PollEvents()
+	var index int
+  selected := false
 	for {
-		fmt.Fprint(os.Stderr, fmt.Sprintf("Choose a city between 0 - %d: ", len(cities)-1))
-		input, _ := r.ReadString('\n')
-		number, err = strconv.Atoi(input[:len(input)-1])
-		if err != nil {
-			fmt.Println(fmt.Sprintf("%s is not a valid number", input))
-		}
+		e := <-uiEvents
 
-		if number >= 0 && number < len(cities) {
-			break
+		switch e.ID {
+		case "j", "<Down>":
+			l.ScrollDown()
+		case "k", "<Up>":
+			l.ScrollUp()
+		case "<C-d>":
+			l.ScrollHalfPageDown()
+		case "<C-u>":
+			l.ScrollHalfPageUp()
+		case "<C-f>":
+			l.ScrollPageDown()
+		case "<C-b>":
+			l.ScrollPageUp()
+		case "<Home>":
+		case "<C-c>":
+			os.Exit(0)
+		case "<Enter>":
+			index = l.SelectedRow
+      selected = true
 		}
+  
+    if(selected){
+      return index 
+    }
+		ui.Render(l)
 	}
-	return number
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
