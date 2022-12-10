@@ -7,14 +7,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/eoin-barr/weatherme/types"
-	// "github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -28,21 +29,11 @@ const (
 	Preview string = "preview"
 )
 
-func getSecret() string {
-	// env1, err1 := os.LookupEnv("OPEN_WEATHER_API_SECRET")
-	// log.Println(env1, err1)
-	// if env1 == "" {
-	// 	fmt.Println("OPEN_WEATHER_API_SECRET not set")
-	// } else {
-	// 	fmt.Println("OPEN_WEATHER_API_SECRET set: ", env1)
-	// }
-
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println("KEY:", os.Getenv("OPEN_WEATHER_API_SECRET"))
-	return ""
+func calculateDewPoint(temp float64, humidity float64) float64 {
+	const a float64 = 17.62
+	const b float64 = 243.12
+	alpha := math.Log(humidity/100 + a*temp/(b+temp))
+	return math.Round(((b*alpha)/(a-alpha))*100) / 100
 }
 
 func formatPreview(result types.WeatherRes, city string) string {
@@ -52,7 +43,7 @@ func formatPreview(result types.WeatherRes, city string) string {
 		"🌤  Description:\t" + cases.Title(language.English, cases.Compact).String(result.Weather[0].Description) + "\n" +
 		"🌡  Temperature:\t" + strconv.FormatFloat(temp, 'f', 2, 32) + " °C" + "\n" +
 		"🌊 Pressure:\t" + strconv.FormatInt(int64(result.Main.Pressure), 10) + " hPa" + "\n" +
-		"😰 Humitdity:\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n"
+		"😰 Humidity:\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n"
 }
 
 func formatAll(result types.WeatherRes, city string) string {
@@ -60,6 +51,12 @@ func formatAll(result types.WeatherRes, city string) string {
 	tempFeelsLike := result.Main.Feels_like - 273.15
 	tempMin := result.Main.Temp_min - 273.15
 	tempMax := result.Main.Temp_max - 273.15
+
+	dewPoint := calculateDewPoint(temp, float64(result.Main.Humidity))
+
+	timeOffset := time.Duration(result.Timezone * int(time.Second))
+	sunriseTime := time.UnixMilli(int64(result.Sys.Sunrise) * 1000).Add(timeOffset).UTC()
+	sunsetTime := time.UnixMilli(int64(result.Sys.Sunset) * 1000).Add(timeOffset).UTC()
 
 	return "\n🌆  City:\t\t" + city + "\n" +
 		"🌍  Country:\t\t" + result.Sys.Country + "\n" +
@@ -69,19 +66,20 @@ func formatAll(result types.WeatherRes, city string) string {
 
 		"🌤   Description:\t" + cases.Title(language.English, cases.Compact).String(result.Weather[0].Description) + "\n" +
 		"🌡   Temperature:\t" + strconv.FormatFloat(temp, 'f', 2, 32) + " °C" + "\n" +
+		"💧  Dew point:\t\t" + strconv.FormatFloat(dewPoint, 'f', 2, 32) + " °C" + "\n" +
 		"💁‍♀️  Temp Feels Like:\t" + strconv.FormatFloat(tempFeelsLike, 'f', 2, 32) + " °C" + "\n" +
 		"🔥  Temperature Max:\t" + strconv.FormatFloat(tempMax, 'f', 2, 32) + " °C" + "\n" +
 		"🧊  Temperature Min:\t" + strconv.FormatFloat(tempMin, 'f', 2, 32) + " °C" + "\n" +
 		"🌊  Pressure:\t\t" + strconv.FormatInt(int64(result.Main.Pressure), 10) + " hPa" + "\n" +
-		"😰  Humitdity:\t\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n\n" +
+		"😰  Humidity:\t\t" + strconv.FormatInt(int64(result.Main.Humidity), 10) + " %" + "\n\n" +
 
 		"☁️   Cloudiness:\t\t" + strconv.FormatInt(int64(result.Clouds.All), 10) + " %" + "\n" +
 		"🌬   Wind Speed:\t\t" + strconv.FormatFloat(result.Wind.Speed, 'f', 2, 32) + " m/s" + "\n" +
 		"🧭  Wind Direction:\t" + strconv.Itoa(result.Wind.Deg) + " °" + "\n" +
 		"🌁  Visibility:\t\t" + strconv.Itoa(result.Visibility) + "\n\n" +
 
-		"🌅  Sunrise:\t\t" + strconv.Itoa(result.Sys.Sunrise) + "\n" +
-		"🌇  Sunset:\t\t" + strconv.Itoa(result.Sys.Sunset) + "\n"
+		"🌅  Sunrise:\t\t" + sunriseTime.Format("15:04") + " (" + sunriseTime.Format(time.Kitchen) + ") UTC\n" +
+		"🌇  Sunset:\t\t" + sunsetTime.Format("15:04") + " (" + sunsetTime.Format(time.Kitchen) + ") UTC\n"
 }
 
 func getWeather(args []string, view string) {
@@ -192,7 +190,6 @@ var rootCmd = &cobra.Command{
 			getWeather(args, All)
 			return
 		}
-		getSecret()
 		getWeather(args, Preview)
 	},
 }
