@@ -126,7 +126,7 @@ func getWeather(args []string, view string) {
 		if len(filtered) == 1 {
 			CityDetails = filtered
 		} else {
-			index = selectCity(filtered)
+			index = renderList(filtered)
 		}
 	}
 
