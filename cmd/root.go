@@ -19,6 +19,9 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 )
 
 const (
@@ -90,7 +93,7 @@ func getWeather(args []string, view string) {
 
 	q := u.Query()
 	q.Set("q", strings.ToLower(city))
-	q.Set("limit", "1")
+	q.Set("limit", "5")
 	q.Set("appid", secret)
 	u.RawQuery = q.Encode()
 
@@ -117,8 +120,18 @@ func getWeather(args []string, view string) {
 		return
 	}
 
-	lat := CityDetails[0].Lat
-	lon := CityDetails[0].Lon
+	var index = 0
+	if len(CityDetails) > 1 {
+		filtered := uniqueCities(CityDetails)
+		if len(filtered) == 1 {
+			CityDetails = filtered
+		} else {
+			index = renderList(filtered)
+		}
+	}
+
+	lat := CityDetails[index].Lat
+	lon := CityDetails[index].Lon
 
 	var u2 url.URL
 	u2.Scheme = "https"
@@ -179,6 +192,75 @@ var rootCmd = &cobra.Command{
 		}
 		getWeather(args, Preview)
 	},
+}
+
+// Remove duplicates from city list
+func uniqueCities(cities types.CityDetails) types.CityDetails {
+	var filtered types.CityDetails
+	for _, city := range cities {
+		duplicate := false
+		for _, c := range filtered {
+			if city.Name == c.Name && city.Country == c.Country {
+				duplicate = true
+			}
+		}
+		if duplicate == false {
+			filtered = append(filtered, city)
+		}
+	}
+	return filtered
+}
+
+// Give the user a chance to select the correct city.
+func renderList(cities types.CityDetails) int {
+	if err := ui.Init(); err != nil {
+    fmt.Println(err)
+	}
+	defer ui.Close()
+
+	l := widgets.NewList()
+	l.Title = "There are multiple cities with the same name."
+  l.Border = false
+	for i, c := range cities {
+		l.Rows = append(l.Rows, fmt.Sprintf("%d: %s, %s", i, c.Name, c.Country))
+	}
+
+	l.WrapText = false
+	l.SetRect(0, 0, 100, 100)
+  l.SelectedRowStyle.Fg = ui.ColorGreen
+	ui.Render(l)
+	uiEvents := ui.PollEvents()
+	var index int
+  selected := false
+	for {
+		e := <-uiEvents
+
+		switch e.ID {
+		case "j", "<Down>":
+			l.ScrollDown()
+		case "k", "<Up>":
+			l.ScrollUp()
+		case "<C-d>":
+			l.ScrollHalfPageDown()
+		case "<C-u>":
+			l.ScrollHalfPageUp()
+		case "<C-f>":
+			l.ScrollPageDown()
+		case "<C-b>":
+			l.ScrollPageUp()
+		case "<Home>":
+		case "<C-c>":
+			os.Exit(0)
+		case "<Enter>":
+			index = l.SelectedRow
+      selected = true
+		}
+  
+    if(selected){
+      return index 
+    }
+		ui.Render(l)
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
