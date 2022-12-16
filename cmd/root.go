@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 Eoin Barr <eoin.barr@ucdconnect.ie>
 */
 package cmd
 
@@ -214,24 +214,24 @@ func uniqueCities(cities types.CityDetails) types.CityDetails {
 // Give the user a chance to select the correct city.
 func renderList(cities types.CityDetails) int {
 	if err := ui.Init(); err != nil {
-    fmt.Println(err)
+		fmt.Println(err)
 	}
 	defer ui.Close()
 
 	l := widgets.NewList()
 	l.Title = "There are multiple cities with the same name."
-  l.Border = false
+	l.Border = false
 	for i, c := range cities {
 		l.Rows = append(l.Rows, fmt.Sprintf("%d: %s, %s", i, c.Name, c.Country))
 	}
 
 	l.WrapText = false
 	l.SetRect(0, 0, 100, 100)
-  l.SelectedRowStyle.Fg = ui.ColorGreen
+	l.SelectedRowStyle.Fg = ui.ColorGreen
 	ui.Render(l)
 	uiEvents := ui.PollEvents()
 	var index int
-  selected := false
+	selected := false
 	for {
 		e := <-uiEvents
 
@@ -253,12 +253,12 @@ func renderList(cities types.CityDetails) int {
 			os.Exit(0)
 		case "<Enter>":
 			index = l.SelectedRow
-      selected = true
+			selected = true
 		}
-  
-    if(selected){
-      return index 
-    }
+
+		if selected {
+			return index
+		}
 		ui.Render(l)
 	}
 }
