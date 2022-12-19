@@ -85,6 +85,7 @@ func formatAll(result types.WeatherRes, city string) string {
 func getWeather(args []string, view string) {
 
 	city := strings.Join(args[0:], " ")
+	citySplit := strings.Split(city, ",")
 	secret := "db2aec76d1d51a968faea300e25e70cc"
 	var u url.URL
 	u.Scheme = "https"
@@ -118,6 +119,14 @@ func getWeather(args []string, view string) {
 
 	if len(CityDetails) == 0 {
 		return
+	}
+
+	if len(citySplit) > 1 {
+		for i := range citySplit {
+			citySplit[i] = strings.TrimSpace(citySplit[i])
+		}
+		
+		CityDetails = firstMatchingCity(CityDetails, citySplit)
 	}
 
 	var index = 0
@@ -192,6 +201,18 @@ var rootCmd = &cobra.Command{
 		}
 		getWeather(args, Preview)
 	},
+}
+
+// Get first, exact city
+func firstMatchingCity(cities types.CityDetails, search []string) types.CityDetails {
+	var matchingCity types.CityDetails
+	for _, city := range cities {
+		if city.Name == search[0] && city.Country == search[1] {
+			matchingCity = append(matchingCity, city)
+			break
+		}
+	}
+	return matchingCity
 }
 
 // Remove duplicates from city list
